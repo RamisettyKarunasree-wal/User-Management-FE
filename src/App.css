@@ -1,3 +1,15 @@
-.App {
-  text-align: center;
+.links {
+  color: black;
+  text-decoration: none;
+}
+
+.login-btn {
+  background: radial-gradient(circle, #1066cf, #88c6d3, #af7bd1, #dfbbdb);
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 15px;
+}
+.min-w-50 {
+  min-width: 30%;
 }
