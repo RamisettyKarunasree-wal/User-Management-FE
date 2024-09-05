@@ -1,9 +1,17 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 import { Card } from "reactstrap";
 
 export default function Register() {
   const addUser = (event) => {
-    console.log("TODO: need to write addUser functionality");
+    event.preventDefault();
+    const user = {
+      name: event.target.name.value,
+      password: event.target.password.value,
+      email: event.target.email.value,
+      dob: event.target.dob.value,
+    };
+    console.log("Todo: add post functionality", user);
   };
 
   return (
@@ -57,7 +65,14 @@ export default function Register() {
             />
             <br />
             <div className="d-flex justify-content-end">
-              <p className="text-end">Forgot Password</p>
+              <NavLink
+                activeClassName="active w-25"
+                className="links"
+                to="/forgotpassword"
+              >
+                {" "}
+                <p className="text-end">Forgot Password</p>
+              </NavLink>
             </div>
 
             <button type="submit" className="login-btn p-2 mx-auto w-100">

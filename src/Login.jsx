@@ -1,11 +1,15 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import React from "react";
+import { NavLink } from "react-router-dom";
 import { Card } from "reactstrap";
 
 export default function Login() {
   const getUser = (event) => {
     event.preventDefault();
-    console.log("TODO: Login User Functionality to be added");
+    const user = {
+      email: event.target.email.value,
+      password: event.target.password.value,
+    };
+    console.log("TODO: Login User Functionality to be added", user);
   };
 
   return (
@@ -37,7 +41,14 @@ export default function Login() {
             />
             <br />
             <div className="d-flex justify-content-end">
-              <p className="text-end">Forgot Password</p>
+              <NavLink
+                activeClassName="active w-25"
+                className="links"
+                to="/forgotpassword"
+              >
+                {" "}
+                <p className="text-end">Forgot Password</p>
+              </NavLink>
             </div>
             <button type="submit" className="login-btn p-2 mx-auto w-100">
               Login

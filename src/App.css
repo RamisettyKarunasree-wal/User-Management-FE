@@ -13,3 +13,21 @@
 .min-w-50 {
   min-width: 30%;
 }
+
+h1 {
+  text-align: center;
+  padding-bottom: 40px;
+}
+
+.content-wrapper {
+  background: linear-gradient(to top, #1066cf, #88c6d3, #af7bd1, #dfbbdb);
+}
+
+.header-container {
+  background: #dfbbdb;
+  border-bottom: 1px solid gray;
+}
+
+.active {
+  border-bottom: 5px solid rgb(56, 56, 56);
+}
