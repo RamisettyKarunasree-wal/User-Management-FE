@@ -31,3 +31,80 @@ h1 {
 .active {
   border-bottom: 5px solid rgb(56, 56, 56);
 }
+
+.component-width {
+  width: 500px;
+  padding: 20px;
+}
+
+.app {
+  background: radial-gradient(ellipse at top left, #9052ae 20%, transparent 20%),
+    radial-gradient(ellipse at bottom right, #9052ae 20%, transparent 20%);
+  background-blend-mode: overlay;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.list-wrapper {
+  background-color: rgb(230, 236, 238);
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  max-width: 400px;
+}
+
+.search-icon {
+  position: absolute;
+  right: 10px;
+  font-size: 20px;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.add-btn {
+  background-color: #9052ae;
+  color: white;
+  font-weight: bold;
+}
+.add-btn:hover {
+  background-color: #9052ae90;
+}
+.initial {
+  width: 30px;
+  height: 30px;
+  background-color: #9052ae;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  font-weight: bold;
+}
+.editbox-letter {
+  width: 100px;
+  height: 100px;
+  background-color: white;
+  color: #9052ae;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 10px;
+  font-weight: bold;
+  font-size: 50px;
+}
+.custom-modal-header,
+.editbox-header {
+  border-bottom: none !important;
+  color: white;
+  font-weight: bold;
+  background-color: #9052ae;
+}
+.loader {
+  font-size: 100px;
+}

@@ -10,6 +10,7 @@ import {
 import Register from "./Register";
 import Login from "./Login";
 import "bootstrap/dist/css/bootstrap.min.css";
+import UserList from "./UserList";
 
 function App() {
   const [login, setLogin] = useState(false);
@@ -54,6 +55,7 @@ function App() {
           <Routes>
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/users" element={<UserList />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         </div>
