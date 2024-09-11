@@ -42,7 +42,7 @@ export default function Login() {
             <br />
             <div className="d-flex justify-content-end">
               <NavLink
-                activeClassName="active w-25"
+                activeClassName="active-nav  w-25"
                 className="links"
                 to="/forgotpassword"
               >

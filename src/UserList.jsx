@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form, Modal, Card, Dropdown } from "react-bootstrap";
+import { Button, Form, Modal, Table } from "react-bootstrap";
 import axios from "axios";
 import { CiSearch } from "react-icons/ci";
-import { MdEmail } from "react-icons/md";
-import { IoPersonAdd } from "react-icons/io5";
-import { RiAdminFill } from "react-icons/ri";
+import ReactPaginate from "react-paginate";
 
 const UserList = () => {
   const baseUrl = process.env.REACT_APP_BASE_URL;
-  const [users, setusers] = useState([]);
+  const [users, setUsers] = useState([]);
   const [filter, setFilter] = useState("");
-  const [selecteduser, setSelecteduser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5;
   const [loading, setLoading] = useState(true);
   const [editForm, setEditForm] = useState({
     _id: "",
@@ -20,28 +20,33 @@ const UserList = () => {
     email: "",
     userRoleId: "",
   });
-  const [newuserForm, setNewuserForm] = useState({
+  const [newUserForm, setNewUserForm] = useState({
     name: "",
     email: "",
     userRoleId: "",
   });
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1, limit = 5) => {
     try {
       setLoading(true);
-      const response = await axios.get(`${baseUrl}/user`);
-      setusers(response.data);
+      const response = await axios.get(`${baseUrl}/user`, {
+        params: {
+          page: page,
+          limit: limit,
+        },
+      });
+      setUsers(response.data);
       setLoading(false);
     } catch (error) {
-      setLoading(true);
       console.error("Error fetching users:", error);
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers(currentPage, usersPerPage);
+  }, [currentPage]);
 
   const handleFilter = (e) => {
     setFilter(e.target.value);
@@ -52,9 +57,9 @@ const UserList = () => {
     setEditForm({ ...editForm, [name]: value });
   };
 
-  const handleNewuserChange = (e) => {
+  const handleNewUserChange = (e) => {
     const { name, value } = e.target;
-    setNewuserForm({ ...newuserForm, [name]: value });
+    setNewUserForm({ ...newUserForm, [name]: value });
   };
 
   const handleEditSubmit = async () => {
@@ -67,16 +72,16 @@ const UserList = () => {
       console.log(e.response.data.message);
     }
   };
-  const [error, setError] = useState(null);
+
   const handleCreateSubmit = async () => {
     try {
-      newuserForm.userRoleId = Number(newuserForm.userRoleId);
-      const res = await axios.post(`${baseUrl}/user`, newuserForm);
+      newUserForm.userRoleId = Number(newUserForm.userRoleId);
+      const res = await axios.post(`${baseUrl}/user`, newUserForm);
       setError("");
       console.log(res.data);
       fetchUsers();
       setShowCreateModal(false);
-      setNewuserForm({ name: "", email: "", userRoleId: "" });
+      setNewUserForm({ name: "", email: "", userRoleId: "" });
     } catch (e) {
       setError(e.response.data.message[0]);
       console.log(e.response.data.message);
@@ -93,7 +98,7 @@ const UserList = () => {
   };
 
   const openEditModal = (user) => {
-    setSelecteduser(user);
+    setSelectedUser(user);
     setEditForm(user);
     setShowEditModal(true);
   };
@@ -109,17 +114,17 @@ const UserList = () => {
 
   const closeCreateModal = () => {
     setShowCreateModal(false);
-    setNewuserForm({ name: "", emailId: "", phone_number: "" });
+    setNewUserForm({ name: "", emailId: "", phone_number: "" });
   };
-
-  const filteredusers = users.filter((user) =>
-    user.name.toLowerCase().includes(filter.toLowerCase())
-  );
+  const handlePageClick = (data) => {
+    const selectedPage = data.selected + 1;
+    setCurrentPage(selectedPage);
+  };
 
   return (
     <div className="d-flex justify-content-center">
       <div className="m-5 w-100 h-100 list-wrapper py-3 px-5 ">
-        <p className="fs-3 fw-bold">users</p>
+        <p className="fs-3 fw-bold">Users</p>
         <div className="container">
           <div className="row align-items-center justify-content-between">
             <div className="col-12 col-md-6 mb-2 mb-md-0">
@@ -148,58 +153,65 @@ const UserList = () => {
             </div>
           </div>
         </div>
+
         <div className="container">
           {!loading ? (
             <div className="row d-flex justify-content-center">
-              {filteredusers.map((user) => (
-                <div className="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
-                  <Card body className="m-2">
-                    <div className="d-flex align-items-center justify-content-start mb-2">
-                      <div className="initial">
-                        {user.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="fw-bold ms-2">{user.name}</div>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-start mb-1">
-                      <div className="me-2">
-                        <MdEmail />
-                      </div>
-                      <div className="overflow-x-auto">{user.email}</div>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-start mb-1">
-                      <div className="me-2">
-                        <RiAdminFill />
-                      </div>
-                      <div>{user.userRoleId === 1 ? "Admin" : "User"}</div>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-center my-2">
-                      <Button
-                        variant="warning"
-                        className="m-1"
-                        onClick={() => openEditModal(user)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="danger"
-                        className="m-1"
-                        onClick={() => handleDelete(user.emailId)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </Card>
-                </div>
-              ))}
+              <Table striped bordered hover>
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user._id}>
+                      <td>{user.name}</td>
+                      <td>{user.email}</td>
+                      <td>{user.userRoleId === 1 ? "Admin" : "User"}</td>
+                      <td>
+                        <Button
+                          variant="warning"
+                          className="m-1"
+                          onClick={() => openEditModal(user)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="danger"
+                          className="m-1"
+                          onClick={() => handleDelete(user.emailId)}
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+              <ReactPaginate
+                breakLabel="..."
+                nextLabel="next"
+                onPageChange={handlePageClick}
+                pageCount={10}
+                previousLabel="previous"
+                containerClassName="pagination justify-content-center"
+                pageClassName="page-item"
+                pageLinkClassName="page-link"
+                previousClassName="page-item"
+                previousLinkClassName="page-link"
+                nextClassName="page-item"
+                nextLinkClassName="page-link"
+                breakClassName="page-item"
+                breakLinkClassName="page-link"
+                activeClassName="active"
+              />
             </div>
           ) : (
             <div className="d-flex justify-content-center align-items-center h-100">
-              <div className="spinner-grow text-secondary loader" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
-              <div className="spinner-grow text-secondary loader" role="status">
-                <span className="visually-hidden">Loading...</span>
-              </div>
               <div className="spinner-grow text-secondary loader" role="status">
                 <span className="visually-hidden">Loading...</span>
               </div>
@@ -210,14 +222,8 @@ const UserList = () => {
         {/* Edit Modal */}
         <Modal show={showEditModal} onHide={closeEditModal} centered>
           <Modal.Header closeButton className="custom-modal-header">
-            Edit user
+            Edit User
           </Modal.Header>
-          <div className="d-flex flex-column justify-content-center align-items-center editbox-header">
-            <div className="editbox-letter mt-2">
-              {editForm.name.charAt(0).toUpperCase()}
-            </div>
-            <div className="fw-bold mt-1">{editForm.name}</div>
-          </div>
           <Modal.Body>
             <Form>
               <Form.Group controlId="formName" className="my-3">
@@ -240,7 +246,7 @@ const UserList = () => {
                   onChange={handleEditChange}
                 />
               </Form.Group>
-              <Form.Group controlId="formPhoneNumber" className="my-3">
+              <Form.Group controlId="formRole" className="my-3">
                 <Form.Label>Select Role</Form.Label>
                 <Form.Control
                   as="select"
@@ -248,7 +254,7 @@ const UserList = () => {
                   value={editForm.userRoleId}
                   onChange={handleEditChange}
                 >
-                  <option value="">Select Role</option>{" "}
+                  <option value="">Select Role</option>
                   <option value="1">Admin</option>
                   <option value="2">User</option>
                 </Form.Control>
@@ -261,54 +267,49 @@ const UserList = () => {
               Cancel
             </Button>
             <Button variant="success" onClick={handleEditSubmit}>
-              Save
+              Save Changes
             </Button>
           </Modal.Footer>
         </Modal>
 
         {/* Create Modal */}
-        <Modal show={showCreateModal} onHide={closeCreateModal}>
+        <Modal show={showCreateModal} onHide={closeCreateModal} centered>
           <Modal.Header closeButton className="custom-modal-header">
-            Add New User
+            Create User
           </Modal.Header>
-          <div className="d-flex flex-column justify-content-center align-items-center editbox-header">
-            <div className="editbox-letter my-2">
-              <IoPersonAdd />
-            </div>
-          </div>
           <Modal.Body>
             <Form>
-              <Form.Group controlId="formNewName" className="my-3">
+              <Form.Group controlId="formName" className="my-3">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
                   type="text"
                   placeholder="Enter name"
                   name="name"
-                  value={newuserForm.name}
-                  onChange={handleNewuserChange}
+                  value={newUserForm.name}
+                  onChange={handleNewUserChange}
                 />
               </Form.Group>
-              <Form.Group controlId="formNewEmail" className="my-3">
+              <Form.Group controlId="formEmail" className="my-3">
                 <Form.Label>Email</Form.Label>
                 <Form.Control
                   type="email"
                   placeholder="Enter email"
                   name="email"
-                  value={newuserForm.email}
-                  onChange={handleNewuserChange}
+                  value={newUserForm.email}
+                  onChange={handleNewUserChange}
                 />
               </Form.Group>
-              <Form.Group controlId="formPhoneNumber" className="my-3">
+              <Form.Group controlId="formRole" className="my-3">
                 <Form.Label>Select Role</Form.Label>
                 <Form.Control
                   as="select"
                   name="userRoleId"
-                  value={newuserForm.userRoleId}
-                  onChange={handleNewuserChange}
+                  value={newUserForm.userRoleId}
+                  onChange={handleNewUserChange}
                 >
-                  <option value="">Select Role</option>{" "}
-                  <option value="2">User</option>
+                  <option value="">Select Role</option>
                   <option value="1">Admin</option>
+                  <option value="2">User</option>
                 </Form.Control>
               </Form.Group>
               {error && <p className="text-danger">{error}</p>}
@@ -318,8 +319,8 @@ const UserList = () => {
             <Button variant="secondary" onClick={closeCreateModal}>
               Cancel
             </Button>
-            <Button variant="primary" onClick={handleCreateSubmit}>
-              Create
+            <Button variant="success" onClick={handleCreateSubmit}>
+              Create User
             </Button>
           </Modal.Footer>
         </Modal>

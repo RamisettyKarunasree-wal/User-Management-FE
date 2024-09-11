@@ -33,7 +33,7 @@ function App() {
           <div className="d-flex justify-content-around p-2 header-container">
             <div className="">
               <NavLink
-                activeClassName="active"
+                activeClassName="active-nav"
                 className="p-2 links"
                 to="/register"
               >
@@ -42,7 +42,7 @@ function App() {
             </div>
             <div className="">
               <NavLink
-                activeClassName="active"
+                activeClassName="active-nav"
                 className="p-2 links"
                 to="/login"
               >
