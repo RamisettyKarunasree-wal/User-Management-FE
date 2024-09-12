@@ -14,7 +14,7 @@ export default function Login() {
 
   return (
     <div className="d-flex align-items-center justify-content-center h-100">
-      <div className="min-w-50 w-sm-75 w-md-50">
+      <div className="component-width">
         <Card body>
           <h1>Login</h1>
           <form onSubmit={getUser}>
@@ -42,7 +42,7 @@ export default function Login() {
             <br />
             <div className="d-flex justify-content-end">
               <NavLink
-                activeClassName="active w-25"
+                activeClassName="active-nav  w-25"
                 className="links"
                 to="/forgotpassword"
               >
