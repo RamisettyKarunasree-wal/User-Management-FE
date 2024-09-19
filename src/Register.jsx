@@ -9,7 +9,8 @@ export default function Register() {
   const addUser = async (event) => {
     event.preventDefault();
     const user = {
-      name: event.target.name.value,
+      firstName: event.target.firstName.value,
+      lastName: event.target.lastName.value,
       password: event.target.password.value,
       email: event.target.email.value,
       userRoleId: Number(event.target.role.value),
@@ -19,7 +20,8 @@ export default function Register() {
       setError("");
       console.log(response.data);
     } catch (e) {
-      setError(e.response.data.message[0]);
+      if (e.status === 400) setError(e.response.data.message[0]);
+      else setError(e.response.data.message);
       console.log(e.response.data.message);
     }
   };
@@ -42,12 +44,23 @@ export default function Register() {
             />
             <br />
             <div className="form-label">
-              <b>Enter Username:</b>
+              <b>Enter FirstName:</b>
             </div>
             <input
               type="text"
-              placeholder="Username"
-              name="name"
+              placeholder="firstName"
+              name="firstName"
+              required
+              className="w-100 p-2 mb-2"
+            />
+            <br />
+            <div className="form-label">
+              <b>Enter LastName:</b>
+            </div>
+            <input
+              type="text"
+              placeholder="lastName"
+              name="lastName"
               required
               className="w-100 p-2 mb-2"
             />

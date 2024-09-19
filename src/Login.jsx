@@ -54,6 +54,14 @@ export default function Login() {
               Login
             </button>
           </form>
+          <button
+            onClick={() =>
+              (window.location.href =
+                "http://localhost:3007/api/auth/google/login")
+            }
+          >
+            Login With Google
+          </button>
         </Card>
       </div>
     </div>
