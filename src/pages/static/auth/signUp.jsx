@@ -30,7 +30,6 @@ import { useState } from 'react'
 import { setUser } from '../../../store/settings'
 import { useDispatch } from 'react-redux'
 import * as yup from 'yup'
-import toast from 'react-hot-toast'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
 import { apiErrorHandler } from '../../../utils/utilities'
@@ -66,7 +65,14 @@ function SignUpForm() {
   }
 
   const registerWithGithub = () => {
-    toast.error('Github integration will come in future.')
+    let query = ''
+    const user = JSON.parse(localStorage.getItem('user'))
+    if (user.email) {
+      query = { provider: AUTH_PROVIDERS.GITHUB, email: user.email }
+      query = `?${new URLSearchParams(query).toString()}`
+    }
+    const link = `${import.meta.env.VITE_APP_BASE_URL}${API_PATHS.GITHUB_SIGN_UP}${query}`
+    window.location.href = link
   }
 
   const signUpHandler = async (data) => {
