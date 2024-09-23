@@ -1,7 +1,12 @@
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { AuthForm, Logo } from '../../../assets'
 import { AuthBanner } from '../../../components'
-import { API_PATHS, AUTH_PROVIDERS, ROUTES } from '../../../utils/constants'
+import {
+  API_PATHS,
+  AUTH_PROVIDERS,
+  FormSchemas,
+  ROUTES,
+} from '../../../utils/constants'
 import {
   AbsoluteCenter,
   Box,
@@ -9,17 +14,26 @@ import {
   Divider,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
+  IconButton,
   Image,
   Input,
+  InputGroup,
+  InputRightElement,
   Text,
 } from '@chakra-ui/react'
-import { BsGithub, BsGoogle } from 'react-icons/bs'
+import { BsEyeFill, BsEyeSlash, BsGithub, BsGoogle } from 'react-icons/bs'
 import useAxios from '../../../utils/axiosSetup'
 import { useState } from 'react'
 import { setUser } from '../../../store/settings'
 import { useDispatch } from 'react-redux'
+import * as yup from 'yup'
+import toast from 'react-hot-toast'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { apiErrorHandler } from '../../../utils/utilities'
 
 export function AppSignUp() {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -43,19 +57,23 @@ function SignUpForm() {
   const nav = useNavigate()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
-  const signUpHandler = async (e) => {
-    e.preventDefault()
-    const data = {
-      firstName: e.target.firstName.value,
-      lastName: e.target.lastName.value,
-      email: e.target.email.value,
-      password: e.target.password.value,
-    }
+  const LABEL_SIZE = 'xs'
+
+  const registerWithGoogle = () => {
+    window.location.href = `${import.meta.env.VITE_APP_BASE_URL}${API_PATHS.GOOGLE_SIGN_UP}`
+  }
+
+  const registerWithGithub = () => {
+    toast.error('Github integration will come in future.')
+  }
+
+  const signUpHandler = async (data) => {
     try {
       setLoading(true)
       const res = await api.post(API_PATHS.SIGN_UP, data, {
-        params: { provider: AUTH_PROVIDERS.JWT },
+        params: { provider: AUTH_PROVIDERS.CREDENTIAL },
       })
       const userData = setUser(res.data)
       dispatch(userData)
@@ -63,8 +81,29 @@ function SignUpForm() {
       nav(ROUTES.PROFILE.link)
     } catch (error) {
       setLoading(false)
+      apiErrorHandler(error)
     }
   }
+
+  const signUpSchema = yup.object().shape({
+    ...FormSchemas,
+    firstName: yup.string().required('First name is required'),
+    lastName: yup.string().required('Last name is required'),
+    confirmPassword: yup
+      .string()
+      .oneOf([yup.ref('password'), null], 'Passwords must match')
+      .required('Confirm password is required'),
+  })
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm({
+    mode: 'all',
+    criteriaMode: 'all',
+    resolver: yupResolver(signUpSchema),
+  })
 
   return (
     <Flex
@@ -86,92 +125,139 @@ function SignUpForm() {
         </Heading>
       </Flex>
 
-      <form onSubmit={signUpHandler}>
-        <FormControl className="login-form-controller">
-          <Box display={'flex'} justifyContent={'space-between'}>
-            <Box>
-              <FormLabel fontSize={'sm'}>First Name</FormLabel>
-              <Input
-                type="string"
-                placeholder="John"
-                mb={6}
-                id="firstName"
-                name="firstName"
-                autoComplete="on"
-              />
-            </Box>
-            <Box>
-              <FormLabel fontSize={'sm'}>Last Name</FormLabel>
-              <Input
-                type="string"
-                placeholder="Smith"
-                mb={6}
-                id="lastName"
-                name="lastName"
-                autoComplete="on"
-              />
-            </Box>
-          </Box>
-          <FormLabel fontSize={'sm'}>Email address</FormLabel>
-          <Input
-            type="email"
-            placeholder="john@gmail.com"
-            mb={6}
-            id="email"
-            name="email"
-            autoComplete="on"
-          />
+      <form onSubmit={handleSubmit(signUpHandler)}>
+        <div className="login-form-controller">
+          <FormControl>
+            <Box display={'flex'} justifyContent={'space-between'} gap={5}>
+              <FormControl isInvalid={errors.firstName} mb={5}>
+                <FormLabel fontSize={LABEL_SIZE}>First Name</FormLabel>
+                <Input
+                  type="string"
+                  name="firstName"
+                  autoComplete="on"
+                  placeholder="John"
+                  {...register('firstName')}
+                />
+                <FormErrorMessage>{errors.firstName?.message}</FormErrorMessage>
+              </FormControl>
 
-          <FormLabel fontSize={'sm'}>Password</FormLabel>
-          <Input
-            type="password"
-            placeholder="Password"
-            mb={6}
-            name="password"
-            autoComplete="on"
-          />
-          <Button
-            colorScheme="teal"
-            variant="solid"
-            w="100%"
-            type="submit"
-            isLoading={loading}
-          >
-            {ROUTES.SIGN_UP.label}
-          </Button>
-          <Box position="relative" padding="5">
-            <Divider />
-            <AbsoluteCenter bg="white" px="4">
-              or
-            </AbsoluteCenter>
-          </Box>
-          <Button
-            leftIcon={<BsGoogle />}
-            colorScheme="cyan"
-            variant="solid"
-            w="100%"
-            mb={2}
-          >
-            {ROUTES.SIGN_UP.label} with Google
-          </Button>
-          <Button
-            leftIcon={<BsGithub />}
-            colorScheme="blackAlpha"
-            variant="solid"
-            w="100%"
-            mb={2}
-          >
-            {ROUTES.SIGN_UP.label} with Github
-          </Button>
-          <Text fontSize={'sm'} textAlign={'right'}>
-            Already have an account{' '}
-            <Link to={ROUTES.SIGN_IN.link}>
-              <Text as={'b'} color={'blue'}>
-                {ROUTES.SIGN_IN.label}
-              </Text>
-            </Link>
-          </Text>
-        </FormControl>
+              <FormControl isInvalid={errors.lastName} mb={5}>
+                <FormLabel fontSize={LABEL_SIZE}>Last Name</FormLabel>
+                <Input
+                  type="string"
+                  name="lastName"
+                  autoComplete="on"
+                  placeholder="Smith"
+                  {...register('lastName')}
+                />
+                <FormErrorMessage>{errors.lastName?.message}</FormErrorMessage>
+              </FormControl>
+            </Box>
+
+            <FormControl isInvalid={errors.email} mb={3}>
+              <FormLabel fontSize={LABEL_SIZE}>Email address</FormLabel>
+              <Input
+                type="email"
+                name="email"
+                autoComplete="on"
+                placeholder="john@gmail.com"
+                {...register('email')}
+              />
+              <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={errors.password} mb={3}>
+              <FormLabel fontSize={LABEL_SIZE}>Password</FormLabel>
+              <InputGroup>
+                <Input
+                  name="password"
+                  autoComplete="on"
+                  placeholder="Password"
+                  {...register('password')}
+                  type={showPassword ? 'text' : 'password'}
+                />
+                <InputRightElement>
+                  <IconButton
+                    variant="link"
+                    icon={showPassword ? <BsEyeFill /> : <BsEyeSlash />}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </InputRightElement>
+              </InputGroup>
+              <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={errors.confirmPassword} mb={3}>
+              <FormLabel fontSize={LABEL_SIZE}>Confirm Password</FormLabel>
+              <InputGroup>
+                <Input
+                  autoComplete="on"
+                  name="confirmPassword"
+                  placeholder="Confirm password"
+                  {...register('confirmPassword')}
+                  type={showPassword ? 'text' : 'password'}
+                />
+                <InputRightElement>
+                  <IconButton
+                    variant="link"
+                    icon={showPassword ? <BsEyeFill /> : <BsEyeSlash />}
+                    onClick={() => setShowPassword(!showPassword)}
+                  />
+                </InputRightElement>
+              </InputGroup>
+              <FormErrorMessage>
+                {errors.confirmPassword?.message}
+              </FormErrorMessage>
+            </FormControl>
+
+            <Button
+              w="100%"
+              type="submit"
+              variant="solid"
+              colorScheme="teal"
+              isLoading={loading}
+              isDisabled={!isValid || isSubmitting}
+            >
+              {ROUTES.SIGN_UP.label}
+            </Button>
+
+            <Box position="relative" padding="5">
+              <Divider />
+              <AbsoluteCenter bg="white" px="4">
+                or
+              </AbsoluteCenter>
+            </Box>
+
+            <Button
+              leftIcon={<BsGoogle />}
+              colorScheme="cyan"
+              variant="solid"
+              w="100%"
+              mb={2}
+              onClick={registerWithGoogle}
+            >
+              Register with Google
+            </Button>
+            <Button
+              leftIcon={<BsGithub />}
+              colorScheme="blackAlpha"
+              variant="solid"
+              w="100%"
+              mb={2}
+              onClick={registerWithGithub}
+            >
+              Register with Github
+            </Button>
+            <Text fontSize={'sm'} textAlign={'right'}>
+              Already have an account{' '}
+              <Link to={ROUTES.SIGN_IN.link}>
+                <Text as={'b'} color={'blue'}>
+                  {ROUTES.SIGN_IN.label}
+                </Text>
+              </Link>
+            </Text>
+          </FormControl>
+        </div>
       </form>
     </Flex>
   )

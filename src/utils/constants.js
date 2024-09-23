@@ -1,3 +1,5 @@
+import * as yup from 'yup'
+
 export const MOBILE_VIEW_WIDTH = 800
 export const P_BG = '#022a70'
 
@@ -13,15 +15,16 @@ export const USER_ROLES = {
 
 export const AUTH_PROVIDERS = {
   GOOGLE: 'google',
-  JWT: 'jwt',
+  GITHUB: 'github',
+  CREDENTIAL: 'credential',
 }
 
 export const API_PATHS = {
   GOOGLE_SIGN_UP: '/auth/google',
   GOOGLE_SIGN_IN: '/auth/google',
 
-  GITHUB_SIGN_UP: '/auth/google',
-  GITHUB_SIGN_IN: '/auth/google',
+  GITHUB_SIGN_UP: '/auth/github',
+  GITHUB_SIGN_IN: '/auth/github',
 
   AUTH_SIGN_OUT: '/auth/logout',
   PROFILE: '/auth/profile',
@@ -31,7 +34,8 @@ export const API_PATHS = {
   SIGN_IN: '/auth/sign-in',
 
   USER_UPDATE: '/user',
-  PASSWORD_UPDATE: '/auth/password-update'
+  PASSWORD_UPDATE: '/auth/password-update',
+  NEW_TOKEN: '/auth/new_access',
 }
 
 export const ROUTES = {
@@ -51,6 +55,18 @@ export const ROUTES = {
     link: '/profile',
     label: 'Profile',
   },
+  USERS: {
+    link: '/users',
+    label: 'Users',
+  },
+  OAUTH_REDIRECT: {
+    link: '/oauth_redirect',
+    label: 'Forgot Password',
+  },
+  FORGOT_PASSWORD: {
+    link: '/forgot_password',
+    label: 'Forgot Password',
+  },
 }
 
 export const NAV_LIST = [
@@ -61,22 +77,24 @@ export const NAV_LIST = [
   {
     link: '/profile',
     label: 'Profile',
-    protection: {
-      roles: [USER_ROLES.ADMIN, USER_ROLES.USER]
-    }
   },
   {
     link: '/users',
     label: 'Users',
     protection: {
-      roles: [USER_ROLES.ADMIN]
-    }
+      roles: [USER_ROLES.ADMIN],
+    },
   },
 ]
 
-export const epochStandard = (epochTime) => {
-  if (epochTime.toString().length === 13) {
-    return Math.floor(epochTime / 1000);
-  }
-  return epochTime;
-};
+export const FormSchemas = {
+  email: yup.string().email('Invalid email').required('Email is required'),
+  password: yup
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .matches(/[A-Z]/, 'At least 1 uppercase letter is required')
+    .matches(/[a-z]/, 'At least 1 lowercase letter is required')
+    .matches(/\d/, 'At least 1 number is required')
+    .matches(/[\W_]/, 'At least 1 special character is required')
+    .required('Password is required'),
+}

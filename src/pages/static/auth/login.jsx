@@ -5,23 +5,35 @@ import {
   Divider,
   Flex,
   FormControl,
+  FormErrorMessage,
   FormLabel,
   Heading,
+  IconButton,
   Image,
   Input,
+  InputGroup,
+  InputRightElement,
   Text,
 } from '@chakra-ui/react'
 import { AuthForm, Logo } from '../../../assets'
 import { AuthBanner } from '../../../components'
-import { BsGithub, BsGoogle } from 'react-icons/bs'
+import { BsEyeFill, BsEyeSlash, BsGithub, BsGoogle } from 'react-icons/bs'
 import './auth.scss'
-import { API_PATHS, AUTH_PROVIDERS, ROUTES } from '../../../utils/constants'
+import {
+  API_PATHS,
+  AUTH_PROVIDERS,
+  FormSchemas,
+  ROUTES,
+} from '../../../utils/constants'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import useAxios from '../../../utils/axiosSetup'
 import { useDispatch } from 'react-redux'
 import { setUser } from '../../../store/settings'
-import toast from 'react-hot-toast'
+import * as yup from 'yup'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { apiErrorHandler } from '../../../utils/utilities'
 
 export function AppLogin() {
   const user = JSON.parse(localStorage.getItem('user'))
@@ -45,25 +57,21 @@ function LoginForm() {
   const nav = useNavigate()
   const dispatch = useDispatch()
   const [loading, setLoading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
-  const loginWithCredentials = async (e) => {
-    e.preventDefault()
-    const data = {
-      email: e.target.email.value,
-      password: e.target.password.value,
-    }
+  const loginWithCredentials = async (data) => {
     try {
       setLoading(true)
       const res = await api.post(API_PATHS.SIGN_IN, data, {
-        params: { provider: AUTH_PROVIDERS.JWT },
+        params: { provider: AUTH_PROVIDERS.CREDENTIAL },
       })
       const userData = setUser(res.data)
       dispatch(userData)
       setLoading(false)
       nav(ROUTES.PROFILE.link)
     } catch (error) {
-      toast.error(error.response.data.message)
       setLoading(false)
+      apiErrorHandler(error)
     }
   }
 
@@ -72,8 +80,26 @@ function LoginForm() {
   }
 
   const loginWithGithub = () => {
-    window.location.href = `${import.meta.env.VITE_APP_BASE_URL}${API_PATHS.GITHUB_SIGN_IN}`
+    let query = '';
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user.email) {
+      query = { provider: AUTH_PROVIDERS.GITHUB, email: user.email } 
+      query = `?${new URLSearchParams(query).toString()}`;
+    }
+    const link = `${import.meta.env.VITE_APP_BASE_URL}${API_PATHS.GITHUB_SIGN_IN}${query}`
+    window.location.href = link
   }
+
+  const loginSchema = yup.object().shape({ ...FormSchemas })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm({
+    mode: 'all',
+    criteriaMode: 'all',
+    resolver: yupResolver(loginSchema),
+  })
 
   return (
     <Flex
@@ -99,41 +125,67 @@ function LoginForm() {
           {ROUTES.SIGN_IN.label}
         </Heading>
       </Flex>
-      <form onSubmit={loginWithCredentials}>
-        <FormControl className="login-form-controller">
-          <FormLabel>Email address</FormLabel>
-          <Input
-            type="email"
-            placeholder="john@gmail.com"
-            mb={6}
-            id="email"
-            name="email"
-          />
-          <FormLabel>Password</FormLabel>
-          <Input
-            type="password"
-            placeholder="Password"
-            mb={6}
-            id="password"
-            name="password"
-            autoComplete="on"
-          />
+      <form onSubmit={handleSubmit(loginWithCredentials)}>
+        <div className="login-form-controller">
+          <FormControl isInvalid={errors.email} mb={5}>
+            <FormLabel>Email address</FormLabel>
+            <Input
+              type="text"
+              name="email"
+              autoComplete="on"
+              placeholder="john@gmail.com"
+              {...register('email')}
+            />
+            <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+          </FormControl>
+
+          <FormControl isInvalid={errors.password} mb={2}>
+            <FormLabel>Password</FormLabel>
+            <InputGroup>
+              <Input
+                name="password"
+                autoComplete="on"
+                placeholder="Password"
+                {...register('password')}
+                type={showPassword ? 'text' : 'password'}
+              />
+              <InputRightElement>
+                <IconButton
+                  variant="link"
+                  icon={showPassword ? <BsEyeFill /> : <BsEyeSlash />}
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              </InputRightElement>
+            </InputGroup>
+            <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+          </FormControl>
+
+          <Text fontSize={'xs'} textAlign={'right'} mb={5}>
+            <Link to={ROUTES.FORGOT_PASSWORD.link}>
+              <Text as={'b'} color={'blue'}>
+                Forgot Password?
+              </Text>
+            </Link>
+          </Text>
 
           <Button
-            colorScheme="teal"
-            variant="solid"
             w="100%"
             type="submit"
+            variant="solid"
+            colorScheme="teal"
             isLoading={loading}
+            isDisabled={!isValid || isSubmitting}
           >
             {ROUTES.SIGN_IN.label}
           </Button>
+
           <Box position="relative" padding="10">
             <Divider />
             <AbsoluteCenter bg="white" px="4">
               or
             </AbsoluteCenter>
           </Box>
+
           <Button
             leftIcon={<BsGoogle />}
             colorScheme="cyan"
@@ -162,7 +214,7 @@ function LoginForm() {
               </Text>
             </Link>
           </Text>
-        </FormControl>
+        </div>
       </form>
     </Flex>
   )

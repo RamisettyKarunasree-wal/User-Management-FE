@@ -1,29 +1,33 @@
-import { Navigate, Outlet } from 'react-router-dom'
-import { epochStandard, ROUTES } from '../../utils/constants'
+import { Navigate, Outlet, useLocation } from 'react-router-dom'
+import { ROUTES } from '../../utils/constants'
 import { useSelector } from 'react-redux'
+import moment from 'moment/moment'
 
 export default function ProtectedRoute() {
   let user = {}
+  const location = useLocation()
   const storeUser = useSelector((state) => state.settings.user)
-  const currentTime = epochStandard(new Date().getTime())
+  const currentTime = moment().unix()
 
   if (!storeUser || !storeUser._id) {
-    const localStorageUser = localStorage.getItem('user')
-    if (localStorageUser) {
-      user = JSON.parse(localStorageUser)
-      user.expires_at = epochStandard(user.expires_at)
-    } else {
-      user = null
-    }
+    return (
+      <Navigate
+        to={ROUTES.OAUTH_REDIRECT.link}
+        state={{ redirect_to: location.pathname }}
+      />
+    )
   } else {
     user = storeUser
   }
 
   if (user && currentTime < user.expires_at && user.isAuthorized) {
-    console.log("ProtectedRoute ~ user:authorized")
     return <Outlet />
   } else {
-    console.log("ProtectedRoute ~ user: not authorized", user)
-    return <Navigate to={ROUTES.SIGN_IN.link} />
+    return (
+      <Navigate
+        to={ROUTES.OAUTH_REDIRECT.link}
+        state={{ redirect_to: location.pathname }}
+      />
+    )
   }
 }

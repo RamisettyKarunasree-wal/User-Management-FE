@@ -16,7 +16,6 @@ import {
   Heading,
   Input,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -33,7 +32,7 @@ import { setUser } from '../../../store/settings'
 import { BsArrowLeft } from 'react-icons/bs'
 
 function EditProfile({ editMode }) {
-  const api = useAxios();
+  const api = useAxios()
   const dispatch = useDispatch()
   const user = useSelector((state) => state.settings.user)
   const [firstName, setFirstName] = useState(user.firstName)
@@ -45,21 +44,15 @@ function EditProfile({ editMode }) {
       lastName,
       email: user.email,
     }
-    console.log('data', data)
     try {
       const res = await api.patch(`${API_PATHS.USER_UPDATE}/${user._id}`, data)
       if (res.status === 200) {
         editMode(false)
-        const updatedData = {
-          ...user,
-          ...res.data
-        }
         toast.success('Updated the profile details')
-        dispatch(setUser(updatedData))
+        dispatch(setUser(res.data))
       }
     } catch (error) {
-      console.log("updateUser ~ error:", error)
-      toast.error('Failed to updated the profile details');
+      toast.error('Failed to updated the profile details')
     }
   }
 
@@ -120,6 +113,7 @@ function EditProfile({ editMode }) {
             variant="ghost"
             colorScheme="red"
             leftIcon={<BsArrowLeft />}
+            onClick={() => editMode(false)}
           >
             Back
           </Button>
@@ -141,7 +135,6 @@ EditProfile.propTypes = {
   editMode: PropTypes.func.isRequired,
 }
 
-
 export default function Profile() {
   const api = useAxios()
   const user = useSelector((state) => state.settings.user)
@@ -155,11 +148,10 @@ export default function Profile() {
       setSignOutLoading(false)
     } catch (error) {
       setSignOutLoading(false)
-      console.log('SignOut ~ error:', error)
     }
   }
 
-  const toggleModeChange = (mode) => setEditMode(mode);
+  const toggleModeChange = (mode) => setEditMode(mode)
 
   return (
     <Center>
@@ -170,13 +162,10 @@ export default function Profile() {
           <CardHeader>
             <Flex spacing="4">
               <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-                <Avatar
-                  name={`${user.firstName} ${user.lastName}`}
-                  src={user.picture}
-                />
+                <Avatar name={user.fullName} src={user.picture} />
 
                 <Box>
-                  <Heading size="sm">{`${user.firstName} ${user.lastName}`}</Heading>
+                  <Heading size="sm">{user.fullName}</Heading>
                   <Text>Role: {user.userRole.toLowerCase()}</Text>
                 </Box>
               </Flex>
@@ -185,9 +174,6 @@ export default function Profile() {
           <CardBody>
             <TableContainer>
               <Table variant="simple">
-                <TableCaption>
-                  Profile info of {`${user.firstName} ${user.lastName}`}
-                </TableCaption>
                 <Tbody>
                   <Tr>
                     <Td>ID</Td>
@@ -209,24 +195,7 @@ export default function Profile() {
               </Table>
             </TableContainer>
           </CardBody>
-          <CardFooter
-            justify="space-between"
-            flexWrap="wrap"
-            sx={{
-              '& > button': {
-                minW: '136px',
-              },
-            }}
-          >
-            <Button
-              flex="1"
-              variant="ghost"
-              rightIcon={<FaSignOutAlt />}
-              onClick={signOutProcedure}
-              isLoading={isSignOutLoading}
-            >
-              Sign Out
-            </Button>
+          <CardFooter justify="space-between" flexWrap="wrap">
             <Button
               flex="1"
               colorScheme="yellow"
@@ -235,9 +204,17 @@ export default function Profile() {
               onClick={() => {
                 setEditMode(!isEditMode)
               }}
-              isLoading={isSignOutLoading}
             >
               Edit
+            </Button>
+            <Button
+              flex="1"
+              variant="ghost"
+              rightIcon={<FaSignOutAlt />}
+              onClick={signOutProcedure}
+              isLoading={isSignOutLoading}
+            >
+              Sign Out
             </Button>
           </CardFooter>
         </Card>

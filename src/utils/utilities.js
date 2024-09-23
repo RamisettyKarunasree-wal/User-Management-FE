@@ -1,11 +1,9 @@
-import { API_PATHS } from "./constants"
+import toast from 'react-hot-toast'
 
-export const fetchProfile = async (axiosInstance) => {
-  try {
-    const res = await axiosInstance.get(API_PATHS.PROFILE)
-    localStorage.setItem('user', JSON.stringify(res.data))
-    return res.data;
-  } catch (error) {
-    return null
+export const apiErrorHandler = (error, needToast = true) => {
+  let errorMessage = 'Operation failed, please try after sometime.';
+  if (error.message === 'Network Error') {
+    errorMessage = 'Please check internet connection or try after sometime.'
   }
-}
+  if (needToast) toast.error(error?.response?.data?.message || errorMessage) 
+};

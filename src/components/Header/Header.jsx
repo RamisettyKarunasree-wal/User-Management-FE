@@ -27,7 +27,7 @@ export default function Header() {
         {NAV_LIST.filter(
           (n) => {
             if (!n.protection) return true
-            else user && n?.protection?.roles?.includes[user.userRole]
+            else return n.protection.roles.some(r => r === user.userRole)
           }).map((nav) => {
           return (
             <Link to={nav.link} key={nav.link} className="nav-item">
@@ -36,43 +36,6 @@ export default function Header() {
           )
         })}
       </div>
-      {/* {!isSignedIn ? (
-        <div
-          style={{
-            display: 'flex',
-            gap: '1rem',
-          }}
-        >
-          <Button
-            size={'sm'}
-            colorScheme="blue"
-            variant="solid"
-            onClick={() => {
-              console.log('clicked getting started')
-              navigator(ROUTES.SIGN_UP.link)
-            }}
-          >
-            Getting Started
-          </Button>
-        </div>
-      ) : (
-        <Flex alignItems={'center'}>
-          <IconButton
-            aria-label="Mode Change"
-            colorScheme="black"
-            size="lg"
-            icon={
-              colorMode === 'light' ? (
-                <IconHelper iconType="IcMoon" iconColor="#000" />
-              ) : (
-                <IconHelper iconType="IoSunny" iconColor="#fff" />
-              )
-            }
-            onClick={toggleColorMode}
-          />
-          <UserButton />
-        </Flex>
-      )} */}
     </div>
   )
 }

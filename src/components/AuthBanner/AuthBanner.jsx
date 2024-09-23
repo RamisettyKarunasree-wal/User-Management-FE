@@ -30,7 +30,7 @@ export function AuthBanner({ authType, authProvider, bannerImage }) {
     <Flex
       className="auth-container"
       w={isTabletOrMobile ? '100%' : '80%'}
-      h={isTabletOrMobile ? '100%' : '90%'}
+      h={isTabletOrMobile ? '100%' : '100%'}
       m={'auto'}
       alignItems={'center'}
       justifyContent="center"

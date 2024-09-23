@@ -1,98 +1,158 @@
 import { useSelector } from 'react-redux'
 import useAxios from '../../../utils/axiosSetup'
 import { useState } from 'react'
-import { API_PATHS } from '../../../utils/constants'
+import { API_PATHS, FormSchemas } from '../../../utils/constants'
 import toast from 'react-hot-toast'
-import { Box, Button, FormControl, FormLabel, Heading, Input } from '@chakra-ui/react'
-import { BsArrowLeft } from 'react-icons/bs'
+import {
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Heading,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+} from '@chakra-ui/react'
+import { BsEyeFill, BsEyeSlash } from 'react-icons/bs'
 import { FaFileCircleCheck } from 'react-icons/fa6'
+import * as yup from 'yup'
+import { useForm } from 'react-hook-form'
+import { yupResolver } from '@hookform/resolvers/yup'
+import { apiErrorHandler } from '../../../utils/utilities'
 
 export default function Security() {
   const api = useAxios()
+  const [loading, setLoading] = useState(false)
   const user = useSelector((state) => state.settings.user)
-  const [currentPass, setCurrentPass] = useState('')
-  const [newPass, setNewPass] = useState('')
-  const [confirmNewPass, setConfirmNewPass] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
-  const updateUser = async () => {
+  const updateUserPassword = async (formData) => {
+    setLoading(true)
     const data = {
-      password: newPass,
+      password: formData.newPassword,
       email: user.email,
     }
 
     try {
       await api.post(`${API_PATHS.PASSWORD_UPDATE}`, data)
+      setLoading(false)
       toast.success('Password updated successfully, login again')
     } catch (error) {
-      toast.error(error?.response?.data?.message || 'Failed to updated the password')
+      setLoading(false)
+      apiErrorHandler(error)
     }
   }
 
+  const passChangeSchema = yup.object().shape({
+    password: FormSchemas.password,
+    newPassword: FormSchemas.password
+      .required('New password is required')
+      .notOneOf(
+        [yup.ref('password')],
+        'New password must be different from the current password',
+      ),
+    confirmNewPassword: FormSchemas.password
+      .required('Confirm new password is required')
+      .oneOf([yup.ref('newPassword'), null], 'New Passwords must match'),
+  })
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid, isSubmitting },
+  } = useForm({
+    mode: 'all',
+    criteriaMode: 'all',
+    resolver: yupResolver(passChangeSchema),
+  })
+
   return (
-    <form style={{minWidth: '430px'}}>
+    <form
+      style={{ minWidth: '430px' }}
+      onSubmit={handleSubmit(updateUserPassword)}
+    >
       <Heading as={'h6'} size={'lg'} textAlign={'center'} mb={6}>
-          Change Password
-        </Heading>
-      <FormControl className="login-form-controller">
-        <Box>
+        Change Password
+      </Heading>
+      <div className="login-form-controller">
+        <FormControl isInvalid={errors.password} mb={5}>
           <FormLabel fontSize={'sm'}>Current password</FormLabel>
-          <Input
-            type="string"
-            placeholder="Current password"
-            mb={6}
-            value={currentPass}
-            onChange={(e) => {
-              setCurrentPass(e.target.value)
-            }}
-          />
-        </Box>
-        <Box>
-          <FormLabel fontSize={'sm'}>New password</FormLabel>
-          <Input
-            type="string"
-            placeholder="New password"
-            mb={6}
-            value={newPass}
-            onChange={(e) => {
-              setNewPass(e.target.value)
-            }}
-          />
-        </Box>
-        <FormLabel fontSize={'sm'}>Confirm password</FormLabel>
-        <Input
-          type="string"
-          placeholder="Confirm password"
-          mb={6}
-          value={confirmNewPass}
-          onChange={(e) => {
-            setConfirmNewPass(e.target.value)
-          }}
-        />
-        <Box
-          display={'flex'}
-          justify="space-between"
-          flexWrap="wrap"
-          mt={'1rem'}
+          <InputGroup>
+            <Input
+              name="password"
+              autoComplete="on"
+              {...register('password')}
+              placeholder="Current password"
+              type={showPassword ? 'text' : 'password'}
+            />
+            <InputRightElement>
+              <IconButton
+                variant="link"
+                icon={showPassword ? <BsEyeFill /> : <BsEyeSlash />}
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </InputRightElement>
+          </InputGroup>
+          <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+        </FormControl>
+
+        <FormControl isInvalid={errors.newPassword} mb={5}>
+          <FormLabel fontSize={'sm'}>New Password</FormLabel>
+          <InputGroup>
+            <Input
+              name="newPassword"
+              autoComplete="on"
+              {...register('newPassword')}
+              placeholder="New password"
+              type={showPassword ? 'text' : 'password'}
+            />
+            <InputRightElement>
+              <IconButton
+                variant="link"
+                icon={showPassword ? <BsEyeFill /> : <BsEyeSlash />}
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </InputRightElement>
+          </InputGroup>
+          <FormErrorMessage>{errors.newPassword?.message}</FormErrorMessage>
+        </FormControl>
+
+        <FormControl isInvalid={errors.confirmNewPassword} mb={5}>
+          <FormLabel fontSize={'sm'}>Confirm New Password</FormLabel>
+          <InputGroup>
+            <Input
+              autoComplete="on"
+              name="confirmNewPassword"
+              {...register('confirmNewPassword')}
+              placeholder="Confirm New Password"
+              type={showPassword ? 'text' : 'password'}
+            />
+            <InputRightElement>
+              <IconButton
+                variant="link"
+                icon={showPassword ? <BsEyeFill /> : <BsEyeSlash />}
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </InputRightElement>
+          </InputGroup>
+          <FormErrorMessage>
+            {errors.confirmNewPassword?.message}
+          </FormErrorMessage>
+        </FormControl>
+
+        <Button
+          w={'100%'}
+          type="submit"
+          variant="ghost"
+          colorScheme="green"
+          rightIcon={<FaFileCircleCheck />}
+          isLoading={loading}
+          isDisabled={!isValid || isSubmitting}
         >
-          <Button
-            flex="1"
-            variant="ghost"
-            colorScheme="red"
-            leftIcon={<BsArrowLeft />}
-          >
-            Back
-          </Button>
-          <Button
-            flex="1"
-            colorScheme="green"
-            variant="ghost"
-            rightIcon={<FaFileCircleCheck />}
-            onClick={updateUser}
-          >
-            Save
-          </Button>
-        </Box>
-      </FormControl>
+          Save
+        </Button>
+      </div>
     </form>
   )
 }

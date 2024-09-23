@@ -7,8 +7,10 @@ import {
   Card,
   CardBody,
   CardHeader,
+  Center,
   Flex,
   Heading,
+  Input,
   Table,
   TableContainer,
   Tbody,
@@ -19,6 +21,45 @@ import {
 import { API_PATHS } from '../../../utils/constants'
 import { setLoading } from '../../../store/settings'
 import { useDispatch } from 'react-redux'
+import './userList.scss'
+import { FaUserCheck } from 'react-icons/fa'
+
+function UserCardShort({ user, onClick }) {
+  return (
+    <Card
+      className="user-card-short"
+      onClick={() => {
+        onClick(user)
+      }}
+    >
+      <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
+        <Avatar name={user.firstName} src={user.profilePic} />
+        <Box>
+          <Heading size="sm">{`${user.firstName} ${user.lastName || ''}`}</Heading>
+          <Text fontSize={'xs'}>{user.email}</Text>
+        </Box>
+      </Flex>
+    </Card>
+  )
+}
+
+UserCardShort.propTypes = {
+  user: PropTypes.object.isRequired,
+  onClick: PropTypes.func.isRequired,
+}
+
+function UserNotSelected() {
+  return (
+    <Flex className="user-not-selected">
+      <Center className="icon-caption">
+        <FaUserCheck size={64} />
+        <Text fontSize={'md'} mt={2}>
+          Select any profile
+        </Text>
+      </Center>
+    </Flex>
+  )
+}
 
 function UserCard({ user }) {
   return (
@@ -30,7 +71,7 @@ function UserCard({ user }) {
 
             <Box>
               <Heading size="sm">{user.firstName}</Heading>
-              <Text>{user.userRoleId === 1 ? 'Admin' : 'User'}, Veltris</Text>
+              <Text>{user.userRole}, Veltris</Text>
             </Box>
           </Flex>
         </Flex>
@@ -66,17 +107,17 @@ export default function UsersList() {
   const api = useAxios()
   const dispatch = useDispatch()
   const [users, setUsers] = useState([])
+  const [currentSelected, setCurrentSelected] = useState(null)
 
   useEffect(() => {
     const getUsersList = async () => {
       try {
         dispatch(setLoading(true))
         const res = await api.get(API_PATHS.USERS_LIST)
-        setUsers(new Array(9).fill(res.data[0]))
+        setUsers(res.data)
         dispatch(setLoading(false))
       } catch (error) {
         dispatch(setLoading(false))
-        console.log('GetProfile ~ error:', error)
       }
     }
 
@@ -84,18 +125,36 @@ export default function UsersList() {
   }, [])
 
   return (
-    <div
-      style={{
-        padding: '1rem',
-        display: 'flex',
-        flexWrap: 'wrap',
-        gap: '1rem',
-        justifyContent: 'center',
-      }}
-    >
-      {users.map((user) => {
-        return <UserCard user={user} key={user._id} />
-      })}
-    </div>
+    <Flex className='user-list-wrapper'>
+      <Box className='profile-list-view'>
+        <Box className='user-search-box'>
+          <Text fontSize={'xs'}>Search user</Text>
+          <Input type="text" placeholder="John" />
+        </Box>
+        <Box className='user-list-container'>
+          {users.map((user) => {
+            return (
+              <UserCardShort
+                user={user}
+                key={user._id}
+                onClick={(user) => {
+                  setCurrentSelected(user)
+                }}
+              />
+            )
+          })}
+        </Box>
+      </Box>
+      <Box w={'100%'}>
+        {currentSelected ? (
+          <>
+            <p>Profile</p>
+            <pre>{JSON.stringify(currentSelected, null, '\t')}</pre>
+          </>
+        ) : (
+          <UserNotSelected />
+        )}
+      </Box>
+    </Flex>
   )
 }
