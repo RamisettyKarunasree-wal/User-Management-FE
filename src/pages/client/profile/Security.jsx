@@ -144,7 +144,6 @@ export default function Security() {
         <Button
           w={'100%'}
           type="submit"
-          variant="ghost"
           colorScheme="green"
           rightIcon={<FaFileCircleCheck />}
           isLoading={loading}

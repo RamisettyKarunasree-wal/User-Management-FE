@@ -52,7 +52,7 @@ export const useAxios = () => {
         unAuthHandler()
       }
       if (error?.response?.status === 403) {
-        toast.error('You do not have access to these resources.')
+        toast.error('Blocked or do not have access to these resources.')
       }
       return Promise.reject(error)
     },

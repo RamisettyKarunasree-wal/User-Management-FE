@@ -19,7 +19,7 @@ export default function OAuthRedirect() {
         dispatch(setUser(response.data))
         navigate(location?.state?.redirect_to || ROUTES.PROFILE.link)
       } catch (error) {
-        navigate(ROUTES.PROFILE.link)
+        navigate(ROUTES.SIGN_IN.link)
       }
     }
     fetchData()

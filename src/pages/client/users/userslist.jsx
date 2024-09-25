@@ -5,24 +5,21 @@ import {
   Avatar,
   Box,
   Card,
-  CardBody,
-  CardHeader,
   Center,
   Flex,
   Heading,
   Input,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
   Text,
-  Tr,
 } from '@chakra-ui/react'
 import { API_PATHS } from '../../../utils/constants'
-import { setLoading } from '../../../store/settings'
-import { useDispatch } from 'react-redux'
+import { setLoading, setStoreUserList } from '../../../store/settings'
+import { useDispatch, useSelector } from 'react-redux'
 import './userList.scss'
 import { FaUserCheck } from 'react-icons/fa'
+import Profile from '../profile/profile'
+import { DebounceInput } from 'react-debounce-input'
+import ResponsivePagination from 'react-responsive-pagination'
+import 'react-responsive-pagination/themes/classic.css'
 
 function UserCardShort({ user, onClick }) {
   return (
@@ -61,77 +58,58 @@ function UserNotSelected() {
   )
 }
 
-function UserCard({ user }) {
-  return (
-    <Card maxW="md">
-      <CardHeader>
-        <Flex spacing="4">
-          <Flex flex="1" gap="4" alignItems="center" flexWrap="wrap">
-            <Avatar name={user.firstName} src={user.profilePic} />
-
-            <Box>
-              <Heading size="sm">{user.firstName}</Heading>
-              <Text>{user.userRole}, Veltris</Text>
-            </Box>
-          </Flex>
-        </Flex>
-      </CardHeader>
-      <CardBody>
-        <TableContainer>
-          <Table variant="simple">
-            <Tbody>
-              <Tr>
-                <Td>ID</Td>
-                <Td>{user._id}</Td>
-              </Tr>
-              <Tr>
-                <Td>Email</Td>
-                <Td>{user.email}</Td>
-              </Tr>
-              <Tr>
-                <Td>Status</Td>
-                <Td>{user.isActive ? 'Active' : 'Not Active'}</Td>
-              </Tr>
-            </Tbody>
-          </Table>
-        </TableContainer>
-      </CardBody>
-    </Card>
-  )
-}
-UserCard.propTypes = {
-  user: PropTypes.object.isRequired,
-}
-
 export default function UsersList() {
+  const PER_PAGE_LIMIT = 5
   const api = useAxios()
   const dispatch = useDispatch()
-  const [users, setUsers] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
   const [currentSelected, setCurrentSelected] = useState(null)
+  const users = useSelector((state) => state.settings.userList)
+
+  const getUsersList = async (params) => {
+    try {
+      dispatch(setLoading(true))
+      const res = await api.get(API_PATHS.USERS_LIST, { params })
+      const countRes = await api.get(API_PATHS.USERS_COUNT, { params })
+      dispatch(setStoreUserList(res.data))
+      setTotalPages(
+        countRes.data.count % PER_PAGE_LIMIT > 0
+          ? parseInt(countRes.data.count / PER_PAGE_LIMIT) + 1
+          : parseInt(countRes.data.count / PER_PAGE_LIMIT),
+      )
+      dispatch(setLoading(false))
+    } catch (error) {
+      dispatch(setLoading(false))
+    }
+  }
 
   useEffect(() => {
-    const getUsersList = async () => {
-      try {
-        dispatch(setLoading(true))
-        const res = await api.get(API_PATHS.USERS_LIST)
-        setUsers(res.data)
-        dispatch(setLoading(false))
-      } catch (error) {
-        dispatch(setLoading(false))
-      }
-    }
+    getUsersList({ page, limit: PER_PAGE_LIMIT })
+  }, [page])
 
-    getUsersList()
-  }, [])
+  useEffect(() => {
+    const current = users.find((user) => user._id === currentSelected?._id)
+    if (!current) return;
+    setCurrentSelected(current)
+  }, [users, currentSelected?._id])
 
   return (
-    <Flex className='user-list-wrapper'>
-      <Box className='profile-list-view'>
-        <Box className='user-search-box'>
-          <Text fontSize={'xs'}>Search user</Text>
-          <Input type="text" placeholder="John" />
+    <Flex className="user-list-wrapper">
+      <Box className="profile-list-view">
+        <Box className="user-search-box">
+          <Text fontSize={'sm'}>Search user</Text>
+          <DebounceInput
+            element={Input}
+            minLength={2}
+            debounceTimeout={500}
+            placeholder="John"
+            onChange={(e) => {
+              getUsersList({ name: e.target.value })
+            }}
+          />
         </Box>
-        <Box className='user-list-container'>
+        <Box className="user-list-container">
           {users.map((user) => {
             return (
               <UserCardShort
@@ -144,13 +122,21 @@ export default function UsersList() {
             )
           })}
         </Box>
+        {totalPages > 1 && (
+          <ResponsivePagination
+            current={page}
+            total={totalPages}
+            onPageChange={setPage}
+          />
+        )}
       </Box>
-      <Box w={'100%'}>
+      <Box
+        style={{
+          width: '100%',
+        }}
+      >
         {currentSelected ? (
-          <>
-            <p>Profile</p>
-            <pre>{JSON.stringify(currentSelected, null, '\t')}</pre>
-          </>
+          <Profile user={currentSelected} />
         ) : (
           <UserNotSelected />
         )}

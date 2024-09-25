@@ -9,8 +9,14 @@ export const LAYOUT = {
 }
 
 export const USER_ROLES = {
-  ADMIN: 'ADMIN',
-  USER: 'USER',
+  ADMIN: {
+    key: 'ADMIN',
+    value: 1,
+  },
+  USER: {
+    key: 'USER',
+    value: 2,
+  }
 }
 
 export const AUTH_PROVIDERS = {
@@ -29,11 +35,14 @@ export const API_PATHS = {
   AUTH_SIGN_OUT: '/auth/logout',
   PROFILE: '/auth/profile',
   USERS_LIST: '/user',
+  USERS_COUNT: '/user/count',
 
   SIGN_UP: '/auth/sign-up',
   SIGN_IN: '/auth/sign-in',
 
+  DELETE_USER: '/user',
   USER_UPDATE: '/user',
+  BLOCK_USER: '/user/block',
   PASSWORD_UPDATE: '/auth/password-update',
   NEW_TOKEN: '/auth/new_access',
 }
@@ -82,7 +91,7 @@ export const NAV_LIST = [
     link: '/users',
     label: 'Users',
     protection: {
-      roles: [USER_ROLES.ADMIN],
+      roles: [USER_ROLES.ADMIN.key],
     },
   },
 ]

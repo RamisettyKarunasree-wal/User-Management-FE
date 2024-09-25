@@ -1,9 +1,8 @@
 .user-list-wrapper {
   height: 100%;
-  border: 5px solid green;
 
   .profile-list-view {
-    min-width: 300px;
+    min-width: 450px;
     padding: 0.5rem 1rem;
     display: flex;
     flex-direction: column;
@@ -39,5 +38,14 @@
   .icon-caption {
     display: flex;
     flex-direction: column;
+  }
+}
+
+.edit-profile-name {
+  padding: 2rem;
+  height: 100%;
+
+  form {
+    width: fit-content;
   }
 }

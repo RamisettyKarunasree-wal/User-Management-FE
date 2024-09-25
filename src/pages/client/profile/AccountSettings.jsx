@@ -8,8 +8,11 @@ import {
 } from '@chakra-ui/react'
 import Profile from './profile'
 import Security from './Security'
+import { useSelector } from 'react-redux'
 
 export default function AccountSettings() {
+  const user = useSelector((state) => state.settings.user)
+
   return (
     <Center mt="1rem">
       <Tabs
@@ -44,7 +47,7 @@ export default function AccountSettings() {
           }}
         >
           <TabPanel>
-            <Profile />
+            <Profile user={user}/>
           </TabPanel>
           <TabPanel>
             <Security />
