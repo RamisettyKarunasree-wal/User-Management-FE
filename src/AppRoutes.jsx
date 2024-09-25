@@ -8,6 +8,8 @@ import Loader from './components/Loader/Loader'
 import { useSelector } from 'react-redux'
 import AccountSettings from './pages/client/profile/AccountSettings'
 import OAuthRedirect from './components/OAuthRedirect/OAuthRedirect'
+import AppForgotPassword from './pages/client/forgot-password/ForgotPassword'
+import AppResetPassword from './pages/client/forgot-password/ResetPassword'
 
 export default function AppRoutes() {
   const loading = useSelector((state) => state.settings.loading)
@@ -40,6 +42,19 @@ export default function AppRoutes() {
         <Route path={ROUTES.SIGN_IN.link} element={<AppLogin />} />
         <Route path={ROUTES.SIGN_UP.link} element={<AppSignUp />} />
         <Route path={ROUTES.OAUTH_REDIRECT.link} element={<OAuthRedirect />} />
+
+        {!(storeUser && storeUser?._id && storeUser.isAuthorized) && (
+          <>
+            <Route
+              path={ROUTES.FORGOT_PASSWORD.link}
+              element={<AppForgotPassword />}
+            />
+            <Route
+              path={ROUTES.RESET_PASSWORD.link}
+              element={<AppResetPassword />}
+            />
+          </>
+        )}
       </Routes>
     </BrowserRouter>
   )

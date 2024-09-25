@@ -78,7 +78,7 @@ function SignUpForm() {
   const signUpHandler = async (data) => {
     try {
       setLoading(true)
-      const res = await api.post(API_PATHS.SIGN_UP, data, {
+      const res = await api.post(API_PATHS.CRED_SIGN_UP, data, {
         params: { provider: AUTH_PROVIDERS.CREDENTIAL },
       })
       const userData = setUser(res.data)

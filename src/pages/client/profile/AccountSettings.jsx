@@ -35,7 +35,7 @@ export default function AccountSettings() {
           }}
         >
           <Tab>Profile</Tab>
-          <Tab>Security</Tab>
+          {user?.isPasswordSet && <Tab>Security</Tab>}
         </TabList>
 
         <TabPanels
@@ -47,11 +47,13 @@ export default function AccountSettings() {
           }}
         >
           <TabPanel>
-            <Profile user={user}/>
+            <Profile user={user} />
           </TabPanel>
-          <TabPanel>
-            <Security />
-          </TabPanel>
+          {user?.isPasswordSet && (
+            <TabPanel>
+              <Security />
+            </TabPanel>
+          )}
         </TabPanels>
       </Tabs>
     </Center>

@@ -32,19 +32,21 @@ export const API_PATHS = {
   GITHUB_SIGN_UP: '/auth/github',
   GITHUB_SIGN_IN: '/auth/github',
 
+  CRED_SIGN_UP: '/auth/sign-up',
+  CRED_SIGN_IN: '/auth/sign-in',
+
   AUTH_SIGN_OUT: '/auth/logout',
+  NEW_TOKEN: '/auth/new_access',
+  PASSWORD_UPDATE: '/auth/password-update',
+  RESET_PASSWORD: '/auth/reset-update',
+  FORGOT_PASSWORD: '/auth/forgot-password',
+
   PROFILE: '/auth/profile',
   USERS_LIST: '/user',
   USERS_COUNT: '/user/count',
-
-  SIGN_UP: '/auth/sign-up',
-  SIGN_IN: '/auth/sign-in',
-
   DELETE_USER: '/user',
   USER_UPDATE: '/user',
   BLOCK_USER: '/user/block',
-  PASSWORD_UPDATE: '/auth/password-update',
-  NEW_TOKEN: '/auth/new_access',
 }
 
 export const ROUTES = {
@@ -75,6 +77,10 @@ export const ROUTES = {
   FORGOT_PASSWORD: {
     link: '/forgot_password',
     label: 'Forgot Password',
+  },
+  RESET_PASSWORD: {
+    link: '/reset_password',
+    label: 'reset Password',
   },
 }
 

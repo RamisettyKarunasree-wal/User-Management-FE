@@ -62,7 +62,7 @@ function LoginForm() {
   const loginWithCredentials = async (data) => {
     try {
       setLoading(true)
-      const res = await api.post(API_PATHS.SIGN_IN, data, {
+      const res = await api.post(API_PATHS.CRED_SIGN_IN, data, {
         params: { provider: AUTH_PROVIDERS.CREDENTIAL },
       })
       const userData = setUser(res.data)
