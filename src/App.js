@@ -1,62 +1,73 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  NavLink,
-  Navigate,
-} from "react-router-dom";
+import React, { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Register from "./Register";
 import Login from "./Login";
-import "bootstrap/dist/css/bootstrap.min.css";
 import UserList from "./UserList";
+import ForgotPassword from "./ForgotPassword";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Profile from "./Profile";
+import EditProfile from "./EditProfile";
+import Navbar from "./Navbar";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchUserData } from "./AuthSlice";
+import PrivateRoute from "./PrivateRoute";
+import ResetPassword from "./ResetPassword";
 
 function App() {
-  const [login, setLogin] = useState(false);
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
   useEffect(() => {
-    if (localStorage.getItem("token")) {
-      setLogin(true);
-    } else {
-      setLogin(false);
-    }
-  }, []);
+    const loadUserData = async () => {
+      await dispatch(fetchUserData());
+    };
+
+    loadUserData();
+  }, [dispatch]);
+
   return (
-    <div
-      className="d-flex flex-column align-items-stretch"
-      style={{ height: "100vh" }}
-    >
+    <div className="d-flex flex-column h-100">
       <BrowserRouter>
-        {login ? (
-          <div className="d-flex justify-content-around p-2">Users List</div>
-        ) : (
-          <div className="d-flex justify-content-around p-2 header-container">
-            <div className="">
-              <NavLink
-                activeClassName="active-nav"
-                className="p-2 links"
-                to="/register"
-              >
-                Register
-              </NavLink>
-            </div>
-            <div className="">
-              <NavLink
-                activeClassName="active-nav"
-                className="p-2 links"
-                to="/login"
-              >
-                Login
-              </NavLink>
-            </div>
-          </div>
-        )}
-        <div className="bg-primary h-100 content-wrapper">
+        {isAuthenticated && <Navbar />}{" "}
+        <div className="content-wrapper flex-grow-1">
           <Routes>
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/users" element={<UserList />} />
-            <Route path="*" element={<Navigate to="/login" />} />
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/edit-profile"
+              element={
+                <PrivateRoute>
+                  <EditProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <PrivateRoute>
+                  <UserList />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="*"
+              element={
+                <PrivateRoute>
+                  <Profile />
+                </PrivateRoute>
+              }
+            />
           </Routes>
         </div>
       </BrowserRouter>

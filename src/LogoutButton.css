@@ -1,0 +1,26 @@
+.logout-btn {
+  background-color: #563d7c; /* Deeper purple matching login component */
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Slightly larger shadow */
+}
+
+.logout-btn:hover {
+  background-color: #452c6b; /* Slightly darker hover state */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Stronger shadow on hover */
+}
+
+.logout-btn:focus {
+  outline: none;
+}
+
+.logout-btn:active {
+  background-color: #3b255c; /* Darkest state for active button */
+  box-shadow: none; /* Remove shadow when active */
+}

@@ -1,0 +1,85 @@
+.edit-profile-container {
+  background-color: #f8f9fa;
+  padding: 20px;
+}
+
+.edit-profile-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+}
+
+.edit-profile-heading {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.change-password-heading {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 10px; /* Added margin for spacing */
+}
+
+.edit-profile-btn {
+  background-color: #9052ae;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Added transition for box-shadow */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.edit-profile-btn:hover {
+  background-color: #7b4296;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Slightly increased shadow on hover */
+}
+
+.edit-profile-btn:focus {
+  outline: none;
+}
+
+.edit-profile-btn:active {
+  background-color: #6a3683;
+  box-shadow: none;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.text-success {
+  color: #28a745;
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}

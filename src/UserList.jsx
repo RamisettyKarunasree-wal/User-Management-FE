@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Button, Form, Modal, Table } from "react-bootstrap";
 import axios from "axios";
-import { CiSearch } from "react-icons/ci";
-import ReactPaginate from "react-paginate";
+import SearchBar from "./SearchBar";
+import Pagination from "./Pagination";
+import EditUserModal from "./EditUserModal";
+import UserTable from "./UserTable";
+import "./UserList.css";
 
 const UserList = () => {
   const baseUrl = process.env.REACT_APP_BASE_URL;
@@ -10,64 +12,38 @@ const UserList = () => {
   const [filter, setFilter] = useState("");
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5;
+  const [editForm, setEditForm] = useState({});
   const [loading, setLoading] = useState(true);
-  const [editForm, setEditForm] = useState({
-    _id: "",
-    firstName: "",
-    lastName: "",
-    email: "",
-    userRoleId: "",
-  });
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState(null); // Add error state
+  const [usersPerPage, setUsersPerPage] = useState(5);
+  const [totalCount, setTotalCount] = useState(0);
 
-  const fetchUsers = async (page = 1, limit = 5) => {
+  const fetchUsers = async (page = 1, searchTerm = "") => {
     try {
       setLoading(true);
+      setError(null); // Reset error state before fetching
       const response = await axios.get(`${baseUrl}/user`, {
         withCredentials: true,
-        params: {
-          page: page,
-          limit: limit,
-        },
+        params: { page, limit: usersPerPage, name: searchTerm },
       });
-      setIsAuthenticated(true);
-      setUsers(response.data);
-
-      setLoading(false);
+      setUsers(response.data.users);
+      setTotalCount(response.data.count);
     } catch (error) {
-      console.error("Error fetching users:", error.status);
+      console.error("Error fetching users:", error);
+      setError("Failed to fetch users. Please try again later."); // Set error message
+    } finally {
       setLoading(false);
-      if (error.status === 401) {
-        setIsAuthenticated(false);
-      }
     }
   };
 
   useEffect(() => {
-    fetchUsers(currentPage, usersPerPage);
-  }, [currentPage]);
+    fetchUsers(currentPage, filter);
+  }, [currentPage, filter]);
 
-  const handleFilter = (e) => {
-    setFilter(e.target.value);
-  };
+  const handleFilter = (e) => setFilter(e.target.value);
+  const handleEditChange = (e) =>
+    setEditForm({ ...editForm, [e.target.name]: e.target.value });
 
-  const handleEditChange = (e) => {
-    const { name, value } = e.target;
-    setEditForm({ ...editForm, [name]: value });
-  };
-
-  const handleLogout = async () => {
-    try {
-      const response = await axios.get(`${baseUrl}/auth/logout`, {
-        withCredentials: true,
-      });
-      console.log(response);
-      window.location.pathname = "/login";
-    } catch (error) {
-      console.error("Error Logging Out:", error);
-    }
-  };
   const handleEditSubmit = async () => {
     try {
       await axios.patch(
@@ -75,221 +51,74 @@ const UserList = () => {
         { ...editForm },
         { withCredentials: true }
       );
-      fetchUsers();
+      fetchUsers(currentPage, filter);
       setShowEditModal(false);
-    } catch (e) {
-      console.log(e.response.data.message);
+    } catch (error) {
+      console.error("Error updating user:", error);
+      setError("Failed to update user. Please try again later.");
     }
   };
 
-  const handleDelete = async (email) => {
-    try {
-      await axios.delete(`${baseUrl}/users/${email}`);
-      fetchUsers();
-    } catch (error) {
-      console.error("Error deleting user:", error);
+  const handleDelete = async (id) => {
+    const sure = window.confirm("Are you sure, you want to delete?");
+    if (sure) {
+      try {
+        await axios.delete(`${baseUrl}/user/${id}`, { withCredentials: true });
+        fetchUsers(currentPage, filter);
+      } catch (error) {
+        console.error("Error deleting user:", error);
+        setError("Failed to delete user. Please try again later.");
+      }
     }
   };
 
   const openEditModal = (user) => {
+    delete user.password;
     setEditForm(user);
     setShowEditModal(true);
   };
 
-  const closeEditModal = () => {
-    setShowEditModal(false);
-    setEditForm({ name: "", emailId: "", phone_number: "" });
-  };
+  const closeEditModal = () => setShowEditModal(false);
 
-  const handlePageClick = (data) => {
-    const selectedPage = data.selected + 1;
-    setCurrentPage(selectedPage);
-  };
+  const handlePageClick = (data) => setCurrentPage(data.selected + 1);
+
+  const pageCount = Math.ceil(totalCount / usersPerPage);
 
   return (
     <>
-      {isAuthenticated ? (
-        <div className="d-flex justify-content-center">
-          <div className="m-5 w-100 h-100 list-wrapper py-3 px-5 ">
-            <p className="fs-3 fw-bold">Users</p>
-            <div className="container">
-              <div className="row align-items-center justify-content-between">
-                <div className="col-12 col-md-6 mb-2 mb-md-0">
-                  <div className="d-flex search-input-wrapper align-items-center">
-                    <span className="search-icon me-2">
-                      <CiSearch />
-                    </span>
-                    <Form.Control
-                      type="text"
-                      placeholder="Search by name"
-                      value={filter}
-                      onChange={handleFilter}
-                      className="w-100"
-                    />
-                  </div>
-                </div>
-
-                <div className="col-6 col-md-3 text-center">
-                  <button
-                    className="btn btn-primary"
-                    style={{
-                      backgroundColor: "#9052ae",
-                      borderColor: "#9052ae",
-                    }}
-                    onClick={handleLogout}
-                  >
-                    logout
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="container">
-              {!loading ? (
-                <div className="row d-flex justify-content-center">
-                  <Table striped bordered hover>
-                    <thead>
-                      <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((user) => (
-                        <tr key={user._id}>
-                          <td>
-                            {user.firstName} {user.lastName}
-                          </td>
-                          <td>{user.email}</td>
-                          <td>{user.userRoleId === 1 ? "Admin" : "User"}</td>
-                          <td>
-                            <Button
-                              variant="warning"
-                              className="m-1"
-                              onClick={() => openEditModal(user)}
-                            >
-                              Edit
-                            </Button>
-                            <Button
-                              variant="danger"
-                              className="m-1"
-                              onClick={() => handleDelete(user.emailId)}
-                            >
-                              Delete
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                  <ReactPaginate
-                    breakLabel="..."
-                    nextLabel="next"
-                    onPageChange={handlePageClick}
-                    pageCount={10}
-                    previousLabel="previous"
-                    containerClassName="pagination justify-content-center"
-                    pageClassName="page-item"
-                    pageLinkClassName="page-link"
-                    previousClassName="page-item"
-                    previousLinkClassName="page-link"
-                    nextClassName="page-item"
-                    nextLinkClassName="page-link"
-                    breakClassName="page-item"
-                    breakLinkClassName="page-link"
-                    activeClassName="active"
-                  />
-                </div>
-              ) : (
-                <div className="d-flex justify-content-center align-items-center h-100">
-                  <div
-                    className="spinner-grow text-secondary loader"
-                    role="status"
-                  >
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Edit Modal */}
-            <Modal show={showEditModal} onHide={closeEditModal} centered>
-              <Modal.Header closeButton className="custom-modal-header">
-                Edit User
-              </Modal.Header>
-              <Modal.Body>
-                <Form>
-                  <Form.Group controlId="formName" className="my-3">
-                    <Form.Label>FirstName</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter firstName"
-                      name="firstName"
-                      value={editForm.firstName}
-                      onChange={handleEditChange}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="formName" className="my-3">
-                    <Form.Label>LastName</Form.Label>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter lastName"
-                      name="lastName"
-                      value={editForm.lastName}
-                      onChange={handleEditChange}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="formEmail" className="my-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                      type="email"
-                      placeholder="Enter email"
-                      name="email"
-                      value={editForm.email}
-                      onChange={handleEditChange}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="formRole" className="my-3">
-                    <Form.Label>Select Role</Form.Label>
-                    <Form.Control
-                      as="select"
-                      name="userRoleId"
-                      value={editForm.userRoleId}
-                      onChange={handleEditChange}
-                    >
-                      <option value="">Select Role</option>
-                      <option value="1">Admin</option>
-                      <option value="2">User</option>
-                    </Form.Control>
-                  </Form.Group>
-                </Form>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button variant="secondary" onClick={closeEditModal}>
-                  Cancel
-                </Button>
-                <Button variant="success" onClick={handleEditSubmit}>
-                  Save Changes
-                </Button>
-              </Modal.Footer>
-            </Modal>
+      <div className="userlist-container d-flex align-items-center justify-content-center h-100">
+        <div className="userlist-card d-flex flex-column">
+          <div className="userlist-header d-flex justify-content-between align-items-center">
+            <h2 className="userlist-title">User Management</h2>
           </div>
+          <SearchBar filter={filter} handleFilter={handleFilter} />
+          {error && <div className="error-message">{error}</div>}{" "}
+          {/* Error Message */}
+          {!loading ? (
+            <>
+              <UserTable
+                users={users}
+                handleEdit={openEditModal}
+                handleDelete={handleDelete}
+              />
+              <Pagination
+                pageCount={pageCount}
+                handlePageClick={handlePageClick}
+                currentPage={currentPage}
+              />
+            </>
+          ) : (
+            <div className="loading-text">Loading...</div>
+          )}
+          <EditUserModal
+            show={showEditModal}
+            editForm={editForm}
+            handleEditChange={handleEditChange}
+            handleClose={closeEditModal}
+            handleSubmit={handleEditSubmit}
+          />
         </div>
-      ) : (
-        <div>
-          Authentication Failed. Please login Again ----
-          <div>
-            <button
-              className="login-btn p-2 mx-auto w-100"
-              onClick={() => (window.location.pathname = "/login")}
-            >
-              Login
-            </button>
-          </div>
-        </div>
-      )}
+      </div>
     </>
   );
 };

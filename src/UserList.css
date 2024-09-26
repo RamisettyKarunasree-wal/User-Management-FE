@@ -1,0 +1,51 @@
+/* Container */
+.userlist-container {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.userlist-card {
+  width: 100%;
+  max-width: 1200px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+/* Header */
+.userlist-header {
+  margin-bottom: 20px;
+}
+
+.userlist-title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.loading-text {
+  text-align: center;
+  font-size: 18px;
+  margin-top: 20px;
+}
+
+/* Authentication Failure */
+.auth-fail-text {
+  font-size: 20px;
+  color: red;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .userlist-card {
+    padding: 20px;
+  }
+
+  .userlist-title {
+    font-size: 20px;
+  }
+}
