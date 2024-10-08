@@ -116,7 +116,7 @@ export default function Login() {
           <button
             className="linkedin-login-btn mb-3"
             onClick={() =>
-              (window.location.href = `${process.env.REACT_APP_BASE_URL}/auth/google/login`)
+              (window.location.href = `${process.env.REACT_APP_BASE_URL}/auth/linkedin/login`)
             }
           >
             <img src={linkedinIcon} alt="linkedin-icon" className="me-2" />{" "}

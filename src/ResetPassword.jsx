@@ -13,6 +13,7 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+  const [linkExpired, setLinkExpired] = useState(true);
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -20,7 +21,22 @@ export default function ResetPassword() {
     const user = queryParams.get("userId");
     setToken(tokenValue);
     setUserId(user);
+    checkLinkExpired(queryParams.get("token"), queryParams.get("userId"));
   }, []);
+
+  const checkLinkExpired = async (token, userId) => {
+    try {
+      const res = await axios.post(`${baseUrl}/auth/reset-password/verify`, {
+        token,
+        userId,
+      });
+      console.log(res.data.success);
+      setLinkExpired(false);
+    } catch (error) {
+      setLinkExpired(true);
+      console.error(error);
+    }
+  };
 
   const resetPassword = async (event) => {
     event.preventDefault();
@@ -44,7 +60,7 @@ export default function ResetPassword() {
     }
   };
 
-  return (
+  return !linkExpired ? (
     <div className="resetpassword-container d-flex align-items-center justify-content-center h-100">
       <div className="resetpassword-card d-flex">
         {/* Form Section */}
@@ -117,6 +133,12 @@ export default function ResetPassword() {
           </div>
         </div>
       </div>
+    </div>
+  ) : (
+    <div class="error-page">
+      <h1>404</h1>
+      <p>The page you are looking for is not available or has expired.</p>
+      <a href="/">Go Back to Home</a>
     </div>
   );
 }

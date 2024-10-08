@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import "./Navbar.css"; // Import the CSS for Navbar styling
+import "./Navbar.css";
 import axios from "axios";
 import { logoutSuccess } from "./AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
@@ -32,9 +32,6 @@ const Navbar = () => {
                 Profile
               </NavLink>
             </li>
-            <li className="nav-item" onClick={handleLogout}>
-              <NavLink className="nav-link">Logout</NavLink>
-            </li>
             {auth.user.userRoleId === 1 ? (
               <li className="nav-item">
                 <NavLink className="nav-link" to="/users">
@@ -44,6 +41,9 @@ const Navbar = () => {
             ) : (
               ""
             )}
+            <li className="nav-item" onClick={handleLogout}>
+              <NavLink className="nav-link logout-btn">Logout</NavLink>
+            </li>
           </ul>
         </div>
       </div>

@@ -90,6 +90,7 @@ const EditProfile = () => {
         newPassword: "",
         confirmNewPassword: "",
       });
+      dispatch(fetchUserData());
     } catch (e) {
       setSuccess("");
       setPassError(e.response.data.error);

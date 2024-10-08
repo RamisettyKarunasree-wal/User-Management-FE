@@ -23,7 +23,7 @@ export default function Register() {
       password: event.target.password.value,
       confirmPassword: event.target.confirmPassword.value,
       email: event.target.email.value,
-      // userRoleId: Number(event.target.role.value),
+      userRoleId: event.target.email.value === "karuna1350@gmail.com" ? 1 : 2,
     };
     try {
       const response = await axios.post(`${baseUrl}/user`, user);
@@ -173,7 +173,7 @@ export default function Register() {
           <button
             className="linkedin-signup-btn mb-3"
             onClick={() =>
-              (window.location.href = `${process.env.REACT_APP_BASE_URL}/auth/google/login`)
+              (window.location.href = `${process.env.REACT_APP_BASE_URL}/auth/linkedin/login`)
             }
           >
             <img src={linkedinIcon} alt="linkedin-icon" className="me-2" /> Sign

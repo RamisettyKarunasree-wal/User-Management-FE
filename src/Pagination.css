@@ -26,7 +26,7 @@
 }
 
 .page-item.active .page-link {
-  background-color: #563d7c; /* Deep purple for active page */
+  background-color: #563d7c;
   color: white;
   border-color: #563d7c;
 }
