@@ -74,6 +74,10 @@ export const ROUTES = {
     link: '/oauth_redirect',
     label: 'Forgot Password',
   },
+  AUTH_FAILED: {
+    link: '/auth_failed',
+    label: 'Auth Failed',
+  },
   FORGOT_PASSWORD: {
     link: '/forgot_password',
     label: 'Forgot Password',

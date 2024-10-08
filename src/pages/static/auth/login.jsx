@@ -128,7 +128,7 @@ function LoginForm() {
       <form onSubmit={handleSubmit(loginWithCredentials)}>
         <div className="login-form-controller">
           <FormControl isInvalid={errors.email} mb={5}>
-            <FormLabel>Email address</FormLabel>
+            <FormLabel fontSize={'xs'}>Email address</FormLabel>
             <Input
               type="text"
               name="email"
@@ -140,7 +140,7 @@ function LoginForm() {
           </FormControl>
 
           <FormControl isInvalid={errors.password} mb={2}>
-            <FormLabel>Password</FormLabel>
+            <FormLabel fontSize={'xs'}>Password</FormLabel>
             <InputGroup>
               <Input
                 name="password"

@@ -10,6 +10,7 @@ import AccountSettings from './pages/client/profile/AccountSettings'
 import OAuthRedirect from './components/OAuthRedirect/OAuthRedirect'
 import AppForgotPassword from './pages/client/forgot-password/ForgotPassword'
 import AppResetPassword from './pages/client/forgot-password/ResetPassword'
+import AuthFailed from './pages/static/auth/authFailed'
 
 export default function AppRoutes() {
   const loading = useSelector((state) => state.settings.loading)
@@ -53,6 +54,7 @@ export default function AppRoutes() {
               path={ROUTES.RESET_PASSWORD.link}
               element={<AppResetPassword />}
             />
+            <Route path={ROUTES.AUTH_FAILED.link} element={<AuthFailed />} />
           </>
         )}
       </Routes>
