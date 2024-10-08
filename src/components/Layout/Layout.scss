@@ -1,0 +1,15 @@
+.layout {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .outlet-container {
+    width: 100%;
+    &.user {
+      height: calc(100% - 0.2rem);
+    }
+    &.static {
+      height: calc(100% - 60px);
+    }
+  }
+}

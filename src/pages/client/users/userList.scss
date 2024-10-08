@@ -1,0 +1,51 @@
+.user-list-wrapper {
+  height: 100%;
+
+  .profile-list-view {
+    min-width: 450px;
+    padding: 0.5rem 1rem;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #e5e5e5;
+
+    .user-search-box {
+      padding-right: 1rem;
+      margin-bottom: 0.5rem;
+      height: fit-content;
+    }
+
+    .user-list-container {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 1rem;
+    }
+  }
+}
+
+.user-card-short {
+  margin: 0.75rem 0;
+  padding: 0.5rem;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.user-not-selected {
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+
+  .icon-caption {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.edit-profile-name {
+  padding: 2rem;
+  height: 100%;
+
+  form {
+    width: fit-content;
+  }
+}
