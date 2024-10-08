@@ -1,70 +1,63 @@
-# Getting Started with Create React App
+<p align="center">
+  <a href="http://nestjs.com/" target="blank"><img src="https://skillicons.dev/icons?i=react" width="200" alt="Nest Logo" /></a>
+</p>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
+[circleci-url]: https://circleci.com/gh/nestjs/nest 'https://skillicons.dev'
 
-## Available Scripts
+<p align="center">
+  <a href="https://skillicons.dev">
+    <img src="https://skillicons.dev/icons?i=nodejs,js,react,redux,github,npm" />
+  </a>
+</p>
+<p align="center">Basic <a href="https://github.com/nestjs/nest" target="_blank">Nest.js</a> service for users authorization and authentication using OAuth protocols.</p>
 
-In the project directory, you can run:
+## Description
 
-### `npm start`
+This repository features a User Management System developed with React and Redux, providing functionality for user registration, login, and profile management. Built with the React framework and OAuth protocol, the project ensures a modular, scalable architecture and supports OAuth2 for authentication. Social sign-ins are implemented using the OAuth2 protocol, including Sign in with Google and GitHub authentication flows.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Features
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- User Sign-Up.
+  - Username and Password
+  - Register with Google (<a href="https://www.passportjs.org/packages/passport-google-oauth20" target="_blank">passport-google-oauth20</a>)
+  - Register with Github (<a href="https://www.passportjs.org/packages/passport-github2" target="_blank">passport-github2</a>)
+- User Sign-In.
+  - Username and Password
+  - Sign-In with Google (<a href="https://www.passportjs.org/packages/passport-google-oauth20" target="_blank">passport-google-oauth20</a>)
+  - Sign-In with Github (<a href="https://www.passportjs.org/packages/passport-github2" target="_blank">passport-github2</a>)
+- Access and Refresh Token management using JWT tokens and auto-refresh access tokens.
+- Profile Management
+  - Edit/update profile
+  - Change password
+  - Reset Password with email link (<a href="https://nodemailer.com/" target="_blank">Nodemailer</a>)
+  - Forgot Password with email link (<a href="https://nodemailer.com/" target="_blank">Nodemailer</a>)
+- Admin operations
+  - Users list with pagination and search filter
+  - Edit user
+  - Block user
+  - Delete User
+  - Change Password
 
-### `npm test`
+## Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Clone / Download this repository.
+```bash
+$ git clone <repo-link>
+```
+- Node version is required as per the .nvmrc file.
+```bash
+$ nvm use <node_version>
+```
+- Create a .env file and copy required environment variables from the .env.example
+- Run the below command to install all the project dependencies.
 
-### `npm run build`
+```bash
+$ npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Running the app
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+$ npm run dev
+```
